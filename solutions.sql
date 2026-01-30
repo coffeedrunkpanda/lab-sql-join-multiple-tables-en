@@ -34,7 +34,36 @@ ORDER BY average_length_minutes DESC
 LIMIT 1
 
 -- Display the most frequently rented movies in descending order.
+SELECT film.title, count(rental.rental_id) as freq_rental
+FROM rental
+JOIN inventory on inventory.inventory_id = rental.inventory_id
+JOIN film on film.film_id = inventory.film_id
+GROUP BY film.film_id
+ORDER BY freq_rental DESC
 
 -- List the top five genres in gross revenue in descending order.
+SELECT category.name, sum(payment.amount) as revenue
+FROM payment
+JOIN rental on rental.rental_id = payment.rental_id
+JOIN inventory on inventory.inventory_id = rental.inventory_id
+JOIN film_category on film_category.film_id = inventory.film_id
+JOIN category on category.category_id = film_category.category_id
+GROUP BY category.category_id
+ORDER BY revenue  DESC
+LIMIT 5
 
 -- Is "Academy Dinosaur" available for rent from Store 1?
+ SELECT 
+	 film.title,
+	 store.store_id,
+	 inventory.inventory_id,
+	 CASE
+				WHEN rental.return_date NOT NULL THEN 1
+				ELSE 0
+	END AS IS_AVAILABLE
+ FROM inventory
+ JOIN store on store.store_id = inventory.store_id
+ JOIN film on film.film_id = inventory.film_id
+ JOIN rental on rental.inventory_id = inventory.inventory_id
+WHERE store.store_id = 1 AND film.title = "ACADEMY DINOSAUR"
+GROUP BY inventory.inventory_id
